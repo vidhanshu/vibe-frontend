@@ -55,11 +55,11 @@ const Conversation = ({
     });
     const res = await SendMessageHandler(token, chat_id, user_id, message);
     if (res) {
+      console.log('----', [...messages, res], '----');
       setMessages([...messages, res]);
       setMessage('');
     }
     if (chat_id === null) {
-      console.log('there where no chat_id before');
       setChatId(res.chat_id);
     }
     setLoading_send(false);
@@ -80,6 +80,7 @@ const Conversation = ({
             if (chat.sender_id === id) {
               return <RightChatBubble key={index} chat={chat} />;
             }
+            console.log('left me gaya');
             return <LeftChatBubble key={index} chat={chat} />;
           })}
         </ScrollViewWithRefreshControl>
@@ -119,7 +120,7 @@ const LeftChatBubble = ({chat}: ChatBubblePropType) => {
   const {theme} = useAppSelector(state => state.theme);
   return (
     <View
-      className={`my-2 w-[90%] self-start ${theme.bg__colors.bgchatbubbleleft} p-4 rounded-r-full rounded-tl-full`}>
+      className={`my-2 w-[90%] self-start ${theme.bg__colors.bgchatbubbleleft} p-4 rounded-r-md rounded-tl-md`}>
       <Text className={`${theme.text__colors.tp} ${Styles.fonts.pm} text-base`}>
         {chat.message}
       </Text>
@@ -133,7 +134,7 @@ const RightChatBubble = ({chat}: ChatBubblePropType) => {
   const {theme} = useAppSelector(state => state.theme);
   return (
     <View
-      className={`my-2 w-[90%] self-end ${theme.bg__colors.bgchatbubbleright} p-4 rounded-l-full rounded-tr-full`}>
+      className={`my-2 w-[90%] self-end ${theme.bg__colors.bgchatbubbleright} p-4 rounded-l-md rounded-tr-md`}>
       <Text className={`text-white ${Styles.fonts.pm} text-base`}>
         {chat.message}
       </Text>

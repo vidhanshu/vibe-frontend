@@ -25,6 +25,7 @@ type StatusesProps = {
   loading: boolean;
 };
 const Statuses = ({navigation, statuses, loadMore, loading}: StatusesProps) => {
+  const {mode} = useAppSelector(s => s.theme);
   return (
     <Container className="py-2 px-0">
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -35,8 +36,8 @@ const Statuses = ({navigation, statuses, loadMore, loading}: StatusesProps) => {
         <IconBtn loading={loading} className="mt-3" onPress={loadMore}>
           <IonIcons
             name="download-outline"
-            size={ICON_DEFAULT_SIZE - 5}
-            color="#fff"
+            size={ICON_DEFAULT_SIZE}
+            color={mode === 'light' ? '#000' : '#fff'}
           />
         </IconBtn>
       </ScrollView>

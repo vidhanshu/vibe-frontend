@@ -1,5 +1,5 @@
-export const BASE_URL = 'https://vibe-m39i.onrender.com';
-// export const BASE_URL = 'http://192.168.43.35:5000';
+// export const BASE_URL = 'https://vibe-m39i.onrender.com';
+export const BASE_URL = 'http://192.168.43.35:5000';
 
 /**
  * @description Auth Endpoints

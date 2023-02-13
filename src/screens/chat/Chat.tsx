@@ -19,7 +19,7 @@ const Chat = ({navigation, route}: ScreenPropType) => {
   const [chatId, setChatId] = React.useState<number>(chat_id ?? null);
   const getMessages = async () => {
     setLoading(true);
-    const res = await GetAllMessagesHandler(token, chat_id, opposite_user_id);
+    const res = await GetAllMessagesHandler(token, chatId, opposite_user_id);
     setMessages(res);
   };
   const onRefresh = async () => {
