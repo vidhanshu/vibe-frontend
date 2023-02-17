@@ -1,5 +1,6 @@
 import {DARK_THEME, THEME_LIGHT} from '../../styles/Theme';
 import {Post1, UserDataType} from '../../types';
+import {Socket, io} from 'socket.io-client';
 
 import {createSlice} from '@reduxjs/toolkit';
 
@@ -41,7 +42,6 @@ const themeSlice = createSlice({
     },
   },
 });
-
 const INITIAL_POSTS_STATE: {
   posts: Post1[];
 } = {

@@ -27,8 +27,6 @@ import {getHomeStatusesHandler} from '../../requests/handlers/Status';
 const Home = ({navigation, route}: ScreenPropType) => {
   const [refreshing, setRefreshing] = React.useState(false);
   const token = useAppSelector(state => state.auth.token);
-  // const [posts, setPosts] = React.useState<Post1[]>([]);
-
   const dispatch = useAppDispatch();
   // const
   const [statuses, setStatuses] = React.useState<StatusType[]>([]);
@@ -40,6 +38,7 @@ const Home = ({navigation, route}: ScreenPropType) => {
   const ref = React.useRef<ScrollView>(null);
   //when after creating the post we automatically navigates here, we sent the data recived after creating a post to this screen
   const routeData: any = route.params ?? [];
+
   //when user creates new post, it will be added to the top of the posts so that user can feel like he is posting in real time
   React.useEffect(() => {
     //this checks for various different types of data coming from route
@@ -122,7 +121,6 @@ const Home = ({navigation, route}: ScreenPropType) => {
   };
 
   //backdrop , bottomsheet and updating caption stuff
-
   //updated caption
   const [updated_caption, setUpdatedCaption] = useState<UpdateCaptionType>({
     caption: '',

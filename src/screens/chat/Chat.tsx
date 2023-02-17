@@ -2,11 +2,10 @@
 import {ChatTop, Conversation} from '../../components';
 import {MessageType, RecentChatType, ScreenPropType} from '../../types';
 
-import {BASE_URL} from '../../config';
 import {GetAllMessagesHandler} from '../../requests/handlers/Chat';
 import React from 'react';
+import {SocketContext} from '../../navigation/DynamicStack';
 import {View} from 'react-native';
-import {io} from 'socket.io-client';
 import {useAppSelector} from '../../hooks';
 
 const Chat = ({navigation, route}: ScreenPropType) => {
@@ -17,6 +16,9 @@ const Chat = ({navigation, route}: ScreenPropType) => {
   const [refreshing, setRefreshing] = React.useState<boolean>(false);
   const {id: chat_id, user_id: opposite_user_id}: RecentChatType = route.params;
   const [chatId, setChatId] = React.useState<number>(chat_id ?? null);
+  const socket = React.useContext(SocketContext);
+  const id = useAppSelector(state => state.auth.user?.id);
+
   const getMessages = async () => {
     setLoading(true);
     const res = await GetAllMessagesHandler(token, chatId, opposite_user_id);
@@ -44,7 +46,21 @@ const Chat = ({navigation, route}: ScreenPropType) => {
     getMessages();
   }, []);
 
-  const sendMessage = (message: MessageType) => {};
+  //socket.io stuff
+  React.useEffect(() => {
+    //reconnect if the socket is disconnected
+    if (socket.disconnected) {
+      socket.connect();
+    }
+    socket.emit('privateChatRequest', {
+      senderId: id,
+      receiverId: opposite_user_id,
+    });
+  }, []);
+
+  const sendMessage = (message: MessageType) => {
+    socket.emit('privateChatMessage', message);
+  };
 
   return (
     <View className="flex-1">

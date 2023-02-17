@@ -1,14 +1,16 @@
 import {ICON_DEFAULT_SIZE, IonIcons} from '../../config/icons';
-import {Text, TextInput, View} from 'react-native';
+import {TextInput, View} from 'react-native';
 
 import Container from '../Container';
 import IconBtn from '../IconBtn';
 import {MessageType} from '../../types';
+import Messages from './Messages';
 import React from 'react';
+import {ScrollView} from 'react-native-gesture-handler';
 import ScrollViewWithRefreshControl from '../ScrollBarWithRefreshControl';
 import {SendMessageHandler} from '../../requests/handlers/Chat';
+import {SocketContext} from '../../navigation/DynamicStack';
 import {Styles} from '../../styles';
-import {getFormattedTime} from '../../utils';
 import {useAppSelector} from '../../hooks';
 
 type ConversationPropType = {
@@ -40,6 +42,27 @@ const Conversation = ({
   const id = useAppSelector(state => state.auth.user?.id);
   const [loading_send, setLoading_send] = React.useState<boolean>(false);
   const [message, setMessage] = React.useState<string>('');
+  const socket = React.useContext(SocketContext);
+  const ScrollViewRef = React.useRef<ScrollView>(null);
+
+  const onMessageRecieved = React.useCallback(
+    (m: MessageType) => {
+      //scroll to bottom as soon as new message is recieved
+      ScrollViewRef.current?.scrollToEnd({animated: true});
+      setMessages(prev => [...prev, m]);
+    },
+    [setMessages],
+  );
+
+  React.useEffect(() => {
+    //on recieving a message from socket
+    socket.on('privateChatMessage', onMessageRecieved);
+    //cleanup required to stop multiple listeners
+    return () => {
+      socket.off('privateChatMessage', onMessageRecieved);
+      socket.close();
+    };
+  }, [socket, onMessageRecieved]);
 
   const sendMessage = async () => {
     if (message.trim() === '' || !id) {
@@ -55,9 +78,9 @@ const Conversation = ({
     });
     const res = await SendMessageHandler(token, chat_id, user_id, message);
     if (res) {
-      console.log('----', [...messages, res], '----');
       setMessages([...messages, res]);
       setMessage('');
+      ScrollViewRef.current?.scrollToEnd({animated: true});
     }
     if (chat_id === null) {
       setChatId(res.chat_id);
@@ -65,10 +88,16 @@ const Conversation = ({
     setLoading_send(false);
   };
 
+  const handleTypeMessage = React.useCallback(
+    (text: string) => setMessage(text),
+    [],
+  );
+
   return (
     <>
       <Container className={`${theme.bg__colors.bp} flex-1 py-0`}>
         <ScrollViewWithRefreshControl
+          ref={ScrollViewRef}
           loading={loading}
           onLoadMoreButtonPress={onLoadMoreButtonPress}
           dataCount={messages.length}
@@ -76,13 +105,7 @@ const Conversation = ({
           refreshing={refreshing}
           LoadMoreBtnThreshold={50}
           className="flex-1">
-          {messages.map((chat, index) => {
-            if (chat.sender_id === id) {
-              return <RightChatBubble key={index} chat={chat} />;
-            }
-            console.log('left me gaya');
-            return <LeftChatBubble key={index} chat={chat} />;
-          })}
+          <Messages messages={messages} />
         </ScrollViewWithRefreshControl>
       </Container>
       <View
@@ -91,7 +114,7 @@ const Conversation = ({
           className={`${theme.bg__colors.bgt} rounded-full flex-row justify-between pl-2`}>
           <TextInput
             value={message}
-            onChangeText={text => setMessage(text)}
+            onChangeText={handleTypeMessage}
             placeholderTextColor={'#8b949e'}
             placeholder="Type a message..."
             className={`w-[80%]  p-2 ${Styles.fonts.pr} text-base ${theme.text__colors.tp}`}
@@ -109,39 +132,6 @@ const Conversation = ({
         </View>
       </View>
     </>
-  );
-};
-
-interface ChatBubblePropType {
-  chat: MessageType;
-}
-
-const LeftChatBubble = ({chat}: ChatBubblePropType) => {
-  const {theme} = useAppSelector(state => state.theme);
-  return (
-    <View
-      className={`my-2 w-[90%] self-start ${theme.bg__colors.bgchatbubbleleft} p-4 rounded-r-md rounded-tl-md`}>
-      <Text className={`${theme.text__colors.tp} ${Styles.fonts.pm} text-base`}>
-        {chat.message}
-      </Text>
-      <Text className={`${theme.text__colors.tt} ${Styles.fonts.pl} text-xs`}>
-        {getFormattedTime(chat.sentAt) || new Date().toISOString()}
-      </Text>
-    </View>
-  );
-};
-const RightChatBubble = ({chat}: ChatBubblePropType) => {
-  const {theme} = useAppSelector(state => state.theme);
-  return (
-    <View
-      className={`my-2 w-[90%] self-end ${theme.bg__colors.bgchatbubbleright} p-4 rounded-l-md rounded-tr-md`}>
-      <Text className={`text-white ${Styles.fonts.pm} text-base`}>
-        {chat.message}
-      </Text>
-      <Text className={`text-white ${Styles.fonts.pl} text-xs`}>
-        {getFormattedTime(chat.sentAt) || new Date().toISOString()}
-      </Text>
-    </View>
   );
 };
 export default Conversation;

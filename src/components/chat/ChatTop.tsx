@@ -11,6 +11,7 @@ import {useAppSelector} from '../../hooks';
 const ChatTop = ({navigation, route}: ScreenPropType) => {
   const {theme} = useAppSelector(state => state.theme);
   const {user_name, user_profile} = route.params;
+
   return (
     <Container
       className={`flex-row justify-between items-center ${theme.bg__colors.bp} py-4 ${theme.borders.bbt}`}>

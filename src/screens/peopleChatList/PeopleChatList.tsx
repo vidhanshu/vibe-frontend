@@ -49,7 +49,7 @@ const PeopleChatList = ({navigation}: ScreenPropType) => {
 
   return (
     <View className={`${theme.bg__colors.bp} flex-1`}>
-      <SearchBarWithBackButton navigation={navigation} />
+      <SearchBarWithBackButton setQuery={() => {}} navigation={navigation} />
       <Container className="flex-1 py-0">
         <ScrollViewWithRefreshControl
           loading={loading}

@@ -26,9 +26,9 @@ const Search = ({navigation}: ScreenPropType) => {
     <View className={`flex-1 ${theme.bg__colors.bp}`}>
       <Container className=" py-0 px-1 items-center w-full">
         <SearchBarWithBackButton
-          className="w-full"
           shouldShowBackButton={false}
           navigation={navigation}
+          setQuery={setQuery}
           onChangeText={async text => {
             setQuery(text);
             const res = await SearchUserHandler(text, setLoading);

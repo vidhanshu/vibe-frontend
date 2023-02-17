@@ -92,13 +92,6 @@ const Status = ({navigation, route}: ScreenPropType) => {
         </View>
       </CustomeHeader>
 
-      {/* <ProgressBar
-        timing={10}
-        onEnd={() => {
-          navigation.goBack();
-        }}
-      /> */}
-
       <LinearGradient
         style={{
           flex: 1,
